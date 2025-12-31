@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Product Management</title>
+
+    <script>
+        function showSection(id) {
+            document.getElementById("add").style.display = "none";
+            document.getElementById("update").style.display = "none";
+            document.getElementById("delete").style.display = "none";
+            document.getElementById("view").style.display = "none";
+
+            document.getElementById(id).style.display = "block";
+        }
+
+        // ADD PRODUCT
+        function addProduct() {
+            const productName = document.getElementById("pname").value;
+            const price = document.getElementById("price").value;
+
+            fetch("/products", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ productName, price })
+            })
+                .then(res => res.json())
+                .then(() => {
+                    document.getElementById("msg").innerText = "✅ Product Added Successfully";
+                });
+        }
+
+        // VIEW PRODUCTS
+        function viewProducts() {
+            fetch("/products")
+                .then(res => res.json())
+                .then(data => {
+                    let output = "<ul>";
+                    data.forEach(p => {
+                        output += `<li>ID:${p.id} | ${p.productName} | ₹${p.price}</li>`;
+                    });
+                    output += "</ul>";
+                    document.getElementById("viewResult").innerHTML = output;
+                });
+        }
+
+        // UPDATE PRODUCT
+        function updateProduct() {
+            const id = document.getElementById("uid").value;
+            const productName = document.getElementById("upname").value;
+            const price = document.getElementById("uprice").value;
+
+            fetch("/products/" + id, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ productName, price })
+            })
+                .then(res => res.json())
+                .then(() => {
+                    document.getElementById("msg").innerText = "✏ Product Updated Successfully";
+                });
+        }
+
+        // DELETE PRODUCT
+        function deleteProduct() {
+            const id = document.getElementById("did").value;
+
+            fetch("/products/" + id, { method: "DELETE" })
+                .then(() => {
+                    document.getElementById("msg").innerText = "❌ Product Deleted Successfully";
+                });
+        }
+    </script>
+</head>
+
+<body>
+<h1>Product Management System</h1>
+<p>Running on Port <b>9090</b></p>
+
+<button onclick="showSection('add')">Add Product</button>
+<button onclick="showSection('view'); viewProducts()">View Products</button>
+<button onclick="showSection('update')">Update Product</button>
+<button onclick="showSection('delete')">Delete Product</button>
+
+<hr>
+
+<!-- ADD -->
+<div id="add" style="display:none;">
+    <h3>Add Product</h3>
+    Name: <input type="text" id="pname"><br><br>
+    Price: <input type="number" id="price"><br><br>
+    <button onclick="addProduct()">Add</button>
+</div>
+
+<!-- VIEW -->
+<div id="view" style="display:none;">
+    <h3>All Products</h3>
+    <div id="viewResult"></div>
+</div>
+
+<!-- UPDATE -->
+<div id="update" style="display:none;">
+    <h3>Update Product</h3>
+    ID: <input type="number" id="uid"><br><br>
+    Name: <input type="text" id="upname"><br><br>
+    Price: <input type="number" id="uprice"><br><br>
+    <button onclick="updateProduct()">Update</button>
+</div>
+
+<!-- DELETE -->
+<div id="delete" style="display:none;">
+    <h3>Delete Product</h3>
+    ID: <input type="number" id="did"><br><br>
+    <button onclick="deleteProduct()">Delete</button>
+</div>
+
+<h3 id="msg"></h3>
+</body>
+</html>
